@@ -1,0 +1,86 @@
+==============================
+# Activity / Lab / Assignment / Project Title
+Lab 4 – Recipe Recommender
+==============================
+Date Created**: October 23, 2025  
+Last Modification Date: October 30, 2025  
+Lab URL: http://localhost:3000  
+GIT: https://git.cs.dal.ca/melbayomi/csci3172.git
+==============================
+ Authors
+  [Mohamed Elbayomi](mh214513@dal.ca)  
+  Student, Dalhousie University  
+  Student ID: B00957237  
+==============================
+
+## Description
+This project is a Recipe Recommender web application created for CSCI 3172 Lab 4.  
+The app allows anyone input one or more ingredients (for example: chicken, rice) and retrieves matching recipes from the TheMealDB API.  
+The results are displayed as visual cards that include the meal name and image.
+===================================================================================================================
+This lab shows:
+- A custom Node.js backend with an API endpoint (`/api/recipes`)
+- A frontend built with HTML, CSS, and JavaScript
+- Fetching and rendering live data from an external REST API, where it's fine to use it in the assignment
+- Separation of frontend and backend logic
+- Client–server communication using HTTP requests
+===================================================================================================================================================
+The project fully satisfies the Lab 4 requirements by showing a working Node.js server, dynamic API integration, and a responsive user interface.
+==============================------------------------------------==============================================================
+## Built With
+[Node.js](https://nodejs.org/) - Backend server and API routing  
+[HTML5](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5) - Web page structure  
+[CSS3](https://developer.mozilla.org/en-US/docs/Web/CSS) - Styling and layout  
+[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) - Frontend scripting and fetch requests  
+[TheMealDB API](https://www.themealdb.com/) - Public API used to get real meal data and images  
+===================================================================================================================
+File Structure
+Trial/
+ server.js  
+ package.json  
+ 
+ frontend/  
+    index.html  
+    script.js  
+    style.css  
+ README.txt  
+==============================
+How to Run, as IT WILL NOT WORK UNLESS YOU DO THAT, I TRIED AND IT WORKS THIS WAY
+1. Open Git Bash or your terminal CMD.  
+2. Go to the project directory:
+cd lab4
+
+3. Install dependencies:
+npm install
+
+4. Start the server:
+node server.js IT WILL LOAD AND WILL SAY CONNECTED
+
+5. Open a web browser and go to:
+http://localhost:3000
+==============================
+API Details
+TheMealDB is a free, public recipe API that provides meal data, images, and ingredient information.  
+It is used here to dynamically populate recipes based on the user’s input.
+
+Example endpoint:
+https://www.themealdb.com/api/json/v1/1/filter.php?i=chicken
+
+and for whoever is marking this, :https://reqbin.com/ 
+this website if you pasted the api link on it, it will give you json format of how the api is from inside
+
+================================================================================================================
+Returns a JSON object containing meals that use the specified ingredient.  
+Each meal includes:
+- `strMeal`: Name of the meal  
+- `strMealThumb`: Image URL  
+==============================
+## Debugging Tools Used
+**Tool Used:** ChatGPT (OpenAI)  
+**Purpose:** Used only for debugging and asking general questions, such as getting recommendations or verifying logic.    
+**Why Used:** To confirm that the final project meets the Lab 4 requirements well.  
+**Modifications:** All final code, structure, and logic were written manually by me. ChatGPT was not used to generate or write any line of code.  
+=============================================================
+Acknowledgments
+- Dalhousie University – CSCI 3172  
+- [TheMealDB](https://www.themealdb.com/) for providing free meal data 
