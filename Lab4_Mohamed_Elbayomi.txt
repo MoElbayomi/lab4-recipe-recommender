@@ -6,6 +6,7 @@ Date Created**: October 23, 2025
 Last Modification Date: October 30, 2025  
 Lab URL: http://localhost:3000  
 GIT: https://git.cs.dal.ca/melbayomi/csci3172.git
+Lab URL : https://lab4-recipe-recommender.netlify.app/
 ==============================
  Authors
   [Mohamed Elbayomi](mh214513@dal.ca)  
