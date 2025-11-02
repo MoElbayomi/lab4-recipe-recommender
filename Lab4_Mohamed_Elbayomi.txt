@@ -2,8 +2,8 @@
 # Activity / Lab / Assignment / Project Title
 Lab 4 – Recipe Recommender
 ==============================
-Date Created**: October 23, 2025  
-Last Modification Date: October 30, 2025  
+Date Created: October 23, 2025  
+Last Modification Date: November 2, 2025  
 Lab URL: http://localhost:3000  
 GIT: https://git.cs.dal.ca/melbayomi/csci3172.git
 Lab URL : https://lab4-recipe-recommender.netlify.app/
@@ -14,7 +14,7 @@ Lab URL : https://lab4-recipe-recommender.netlify.app/
   Student ID: B00957237  
 ==============================
 
-## Description
+Description
 This project is a Recipe Recommender web application created for CSCI 3172 Lab 4.  
 The app allows anyone input one or more ingredients (for example: chicken, rice) and retrieves matching recipes from the TheMealDB API.  
 The results are displayed as visual cards that include the meal name and image.
@@ -59,6 +59,8 @@ node server.js IT WILL LOAD AND WILL SAY CONNECTED
 
 5. Open a web browser and go to:
 http://localhost:3000
+
+or on netlify website paste the link i put on the top
 ==============================
 API Details
 TheMealDB is a free, public recipe API that provides meal data, images, and ingredient information.  
@@ -72,16 +74,15 @@ this website if you pasted the api link on it, it will give you json format of h
 
 ================================================================================================================
 Returns a JSON object containing meals that use the specified ingredient.  
-Each meal includes:
-- `strMeal`: Name of the meal  
-- `strMealThumb`: Image URL  
 ==============================
-## Debugging Tools Used
-**Tool Used:** ChatGPT (OpenAI)  
-**Purpose:** Used only for debugging and asking general questions, such as getting recommendations or verifying logic.    
-**Why Used:** To confirm that the final project meets the Lab 4 requirements well.  
-**Modifications:** All final code, structure, and logic were written manually by me. ChatGPT was not used to generate or write any line of code.  
+Debugging Tools Used
+Tool Used: Youtube  
+**Purpose:** Used only checking how to use Neltify Smoothely.    
+**Why Used:** To Confirm how to use Netlify.  
+**Modifications:** All final code, structure, and logic were written manually by me.Youtube only used to see how to use the website well.  
 =============================================================
 Acknowledgments
 - Dalhousie University – CSCI 3172  
-- [TheMealDB](https://www.themealdb.com/) for providing free meal data 
+- [TheMealDB](https://www.themealdb.com/) for providing free meal data
+- https://youtu.be/0P53S34zm44?si=gGQK1B4mt84Upwqc
+- https://youtu.be/4h8B080Mv4U?si=KE7zLhYyFvmcwdIY 
