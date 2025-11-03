@@ -1,92 +1,60 @@
-import express from "express";
-import serverless from "serverless-http";
-//import fetch from "node-fetch";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const app = express();
-
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "*");
-  next();
-});
-
+const express    = require('express');
+const serverless = require('serverless-http');
+const app    = express();
 const router = express.Router();
 
-async function fetchMealDetails(idMeal) {
-  const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${idMeal}`;
-  const resp = await fetch(url);
-  if (!resp.ok) return null;
-  const data = await resp.json();
-  return data.meals ? data.meals[0] : null;
-}
+router.get('/recipes', async (req, res) => {
+  const { ingredients = '', diet = '' } = req.query;
+  const ingList = ingredients
+    .toLowerCase()
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
 
-
-function computeMatchScore(meal, ingList) {
-  const mealIngredients = [];
-  for (let i = 1; i <= 20; i++) {
-    const key = `strIngredient${i}`;
-    const value = meal[key];
-    if (value) {
-      mealIngredients.push(String(value).toLowerCase());
-    }
+  if (!ingList.length) {
+    return res.status(400).json({
+      error: 'Please provide at least one ingredient using ?ingredients=tomato'
+    });
   }
-  let score = 0;
-  ingList.forEach((q) => {
-    if (mealIngredients.some((mi) => mi.includes(q) || q.includes(mi))) {
-      score++;
-    }
-  });
-  return score;
-}
 
-// Main route: GET /recipes
-router.get("/recipes", async (req, res) => {
+  const first    = encodeURIComponent(ingList[0]);
+  const filterUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${first}`;
+
   try {
-    const { ingredients = "", diet = "" } = req.query;
-    // Normalize and split the comma‑separated ingredients into an array
-    const ingList = ingredients
-      .split(",")
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean);
-
-    if (ingList.length === 0) {
-      return res.status(400).json({
-        error: "Please provide at least one ingredient using ?ingredients=egg,tomato",
-      });
-    }
-
-
-    const first = encodeURIComponent(ingList[0]);
-    const filterUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${first}`;
     const filterResp = await fetch(filterUrl);
     const filterData = await filterResp.json();
-
-    let meals = filterData.meals;
-    let notice = "";
-
+    let meals   = filterData.meals;
+    let notice  = '';
 
     if (!meals) {
-      const randomResp = await fetch(
-        "https://www.themealdb.com/api/json/v1/1/search.php?s="
-      );
-      const randomData = await randomResp.json();
-      meals = randomData.meals.slice(0, 8);
-      notice =
-        "No exact matches found. Showing random recipes instead. Try another ingredient for more accurate results.";
+      const randResp  = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
+      const randData  = await randResp.json();
+      meals   = randData.meals.slice(0, 8);
+      notice  = 'No exact matches found. Showing random recipes instead.';
     }
 
-    // Fetch details for the top 8 meals. Fetching only a handful keeps the
-    // response time reasonable, and eight recipes is sufficient for a small UI.
-    const detailPromises = meals.slice(0, 8).map((m) => fetchMealDetails(m.idMeal));
-    const detailedMeals = (await Promise.all(detailPromises)).filter(Boolean);
+    // Fetch details for each meal
+    const detailPromises = meals.slice(0, 8).map(async (m) => {
+      const detailsResp  = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${m.idMeal}`);
+      const detailsData  = await detailsResp.json();
+      return detailsData.meals ? detailsData.meals[0] : null;
+    });
 
-    // Build the final results array including a match score and basic fields
+    const detailedMeals = (await Promise.all(detailPromises)).filter(Boolean);
+    // Compute match scores and assemble result objects
     const results = detailedMeals.map((meal) => {
-      const score = computeMatchScore(meal, ingList);
+      const mealIngredients = [];
+      for (let i = 1; i <= 20; i++) {
+        const key   = `strIngredient${i}`;
+        const value = meal[key];
+        if (value) mealIngredients.push(value.toLowerCase());
+      }
+      let score = 0;
+      ingList.forEach((q) => {
+        if (mealIngredients.some(mi => mi.includes(q) || q.includes(mi))) {
+          score++;
+        }
+      });
       return {
         id: meal.idMeal,
         name: meal.strMeal,
@@ -94,36 +62,31 @@ router.get("/recipes", async (req, res) => {
         area: meal.strArea,
         thumbnail: meal.strMealThumb,
         instructions: meal.strInstructions,
-        ingredients: Array.from({ length: 20 })
-          .map((_, i) => meal[`strIngredient${i + 1}`])
-          .filter(Boolean),
-        score,
+        ingredients: mealIngredients,
+        score
       };
     });
+    // ApplyIING diet filters
+    let filtered = results;
+    const dietLower = diet.toLowerCase();
+    if (dietLower === 'vegetarian') {
+      const nonVeg = ['chicken', 'beef', 'pork', 'meat', 'fish', 'shrimp'];
+      filtered = filtered.filter(item =>
+        !item.ingredients.some(i => nonVeg.some(nv => i.includes(nv)))
+      );
+    } else if (dietLower === 'gluten-free') {
+      const gluten = ['flour', 'bread', 'pasta', 'wheat', 'noodle'];
+      filtered = filtered.filter(item =>
+        !item.ingredients.some(i => gluten.some(g => i.includes(g)))
+      );
+    }
+    filtered.sort((a, b) => b.score - a.score);
 
-    return res.json({ queryIngredients: ingList, notice, results });
-  } catch (error) {
-    console.error("Error in /recipes", error);
-    return res.status(500).json({ error: "Server error" });
+    res.json({ queryIngredients: ingList, notice, results: filtered });
+  } catch (err) {
+    console.error('Error in /recipes', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
-
-
-app.use("/.netlify/functions/api", router);
-app.use("/api", router);
-
-// Export the handler so Netlify can wrap the Express app in Lambda runtime
-export const handler = serverless(app);
-
-
-if (
-  process.env.NODE_ENV !== "production" &&
-  import.meta.url.endsWith("/api.js")
-) {
-  const PORT = process.env.PORT || 8888;
-  app.listen(PORT, () => {
-    console.log(
-      `✅ API running locally on http://localhost:${PORT}/api/recipes`
-    );
-  });
-}
+app.use('/api', router);
+module.exports.handler = serverless(app);
